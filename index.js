@@ -2,6 +2,7 @@ const { templates, surveys } = require('./repositories');
 const { ValidationError } = require('./validationError');
 const questionValidator = require('./questionValidator');
 const responseValidator = require('./responseValidator');
+const resultsCalculator = require('./resultsCalculator');
 
 async function defineSurvey(title, questions) {
     // TODO: authorization
@@ -57,9 +58,9 @@ async function getResults(surveyId) {
 
     if (!survey.closed) throw new Error(`Survey ${surveyId} is still ongoing.`);
 
-    const results = {}; // TODO: calculate results table from responses
+    const template = await templates.getById(survey.templateId);
 
-    return results;
+    return resultsCalculator.calculate(template.questions, survey.responses); // TODO: cache results
 }
 
 exports.defineSurvey = defineSurvey;
