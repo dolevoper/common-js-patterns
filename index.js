@@ -1,64 +1,49 @@
-const uuid = require('uuid');
-
-const templatesById = {};
-const surveysById = {};
+const templatesRepository = require('./repositories/templates');
+const surveysRepository = require('./repositories/surveys');
 
 function defineSurvey(title, questions) {
     // TODO: authorization
     // TODO: validatation
 
-    const id = uuid.v4();
-    const template = { id, title, questions };
-
-    templatesById[id] = template;
-
-    return template;
+    templatesRepository.insert({ title, questions });
 }
 
 function openSurvey(templateId) {
     // TODO: authorization
-    const template = templatesById[templateId];
+    const template = templatesRepository.getById(templateId);
 
-    if (!template) throw new Error(`Survey ${templateId} does not exist.`);
     if (template.open) throw new Error(`Survey ${templateId} is already open.`);
 
-    const id = uuid.v4();
-    const survey = { id, templateId, responses: [] };
-
-    surveysById[id] = survey;
-    template.open = true;
-
-    return { id, template };
+    surveysRepository.insert({ templateId, responses: [] });
+    templatesRepository.put(templateId, { ...template, open: true });
 }
 
 function closeSurvey(surveyId) {
     // TODO: authorization
-    const survey = surveysById[surveyId];
+    const survey = surveysRepository.getById(surveyId);
 
-    if (!survey || survey.closed) throw new Error(`There is no open survey with id ${surveyId}`);
+    if (survey.closed) throw new Error(`Survey ${surveyId} is already closed.`);
 
-    survey.closed = true;
+    surveysRepository.put(surveyId, { ...survey, closed: true });
 
-    const template = templatesById[survey.templateId];
+    const template = templatesRepository.getById(survey.templateId);
 
-    template.open = false;
+    templatesRepository.put(survey.templateId, { ...template, open: false });
 }
 
 function submitResponse(surveyId, response) {
-    const survey = surveysById[surveyId];
+    const survey = surveysRepository.getById(surveyId);
 
-    if (!survey) throw new Error(`There is no survey with id ${surveyId}`);
     if (survey.closed) throw new Error(`Survey ${surveyId} is aleady closed.`);
 
     // TODO: response validation
 
-    survey.responses.push(response);
+    surveysRepository.put(surveyId, { ...survey, resposnes: survey.responses.concat([response]) });
 }
 
 function getResults(surveyId) {
-    const survey = surveysById[surveyId];
+    const survey = surveysRepository.getById(surveyId);
 
-    if (!survey) throw new Error(`There is no survey with id ${surveyId}`);
     if (!survey.closed) throw new Error(`Survey ${surveyId} is still ongoing.`);
 
     const results = {}; // TODO: calculate results table from responses
