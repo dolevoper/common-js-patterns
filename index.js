@@ -1,8 +1,10 @@
 const { templates, surveys } = require('./repositories');
+const questionValidator = require('./questionValidator');
 
 async function defineSurvey(title, questions) {
     // TODO: authorization
-    // TODO: validatation
+    
+    questionValidator.validate(questions);
 
     await templates.insert({ title, questions });
 }
