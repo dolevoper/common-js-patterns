@@ -1,8 +1,12 @@
 const { templates, surveys } = require('./repositories');
+const { ValidationError } = require('./validationError');
 const questionValidator = require('./questionValidator');
 
 async function defineSurvey(title, questions) {
     // TODO: authorization
+    
+    if (typeof title !== 'string') throw new ValidationError('`title` must be a string');
+    if (!title.length) throw new ValidationError('`title` cannot be empty');
     
     questionValidator.validate(questions);
 
