@@ -4,26 +4,41 @@ const clone = require('clone-deep');
 const surveysById = {};
 
 function insert(survey) {
-    put(uuid.v4(), survey);
+    return put(uuid.v4(), survey);
 }
 
 function getAll() {
-    return Object.entries(surveysById).map(([_id, survey]) => ({
-        _id,
-        ...clone(survey)
-    }));
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            const surveys = Object.entries(surveysById).map(([_id, survey]) => ({
+                _id,
+                ...clone(survey)
+            }));
+
+            resolve(surveys);
+        });
+    });
 }
 
 function getById(id) {
-    const survey = surveysById[id];
+    return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+            const survey = surveysById[id];
 
-    if (!survey) throw new Error(`Survey ${templateId} does not exist.`);
+            if (!survey) return reject(new Error(`Survey ${templateId} does not exist.`));
 
-    return clone(survey);
+            resolve(survey);
+        });
+    });
 }
 
 function put(id, survey) {
-    surveysById[id] = clone(survey);
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            surveysById[id] = clone(survey);
+            resolve();
+        });
+    });
 }
 
 exports.insert = insert;

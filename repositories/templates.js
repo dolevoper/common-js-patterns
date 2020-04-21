@@ -4,26 +4,41 @@ const clone = require('clone-deep');
 const templatesById = {};
 
 function insert(template) {
-    put(uuid.v4(), template);
+    return put(uuid.v4(), template);
 }
 
 function getAll() {
-    return Object.entries(templatesById).map(([_id, template]) => ({
-        _id,
-        ...clone(template)
-    }));
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            const templates = Object.entries(templatesById).map(([_id, template]) => ({
+                _id,
+                ...clone(template)
+            }));
+
+            resolve(templates);
+        });
+    });
 }
 
 function getById(id) {
-    const template = templatesById[id];
+    return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+            const template = templatesById[id];
 
-    if (!template) throw new Error(`Survey ${templateId} does not exist.`);
+            if (!template) return reject(new Error(`Survey ${templateId} does not exist.`));
 
-    return clone(template);
+            resolve(template);
+        });
+    });
 }
 
 function put(id, template) {
-    templatesById[id] = clone(template);
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            templatesById[id] = clone(template);
+            resolve();
+        });
+    });
 }
 
 exports.insert = insert;

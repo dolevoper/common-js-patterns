@@ -1,48 +1,51 @@
 const templatesRepository = require('./repositories/templates');
 const surveysRepository = require('./repositories/surveys');
 
-function defineSurvey(title, questions) {
+async function defineSurvey(title, questions) {
     // TODO: authorization
     // TODO: validatation
 
-    templatesRepository.insert({ title, questions });
+    await templatesRepository.insert({ title, questions });
 }
 
-function openSurvey(templateId) {
+async function openSurvey(templateId) {
     // TODO: authorization
-    const template = templatesRepository.getById(templateId);
+    const template = await templatesRepository.getById(templateId);
 
     if (template.open) throw new Error(`Survey ${templateId} is already open.`);
 
-    surveysRepository.insert({ templateId, responses: [] });
-    templatesRepository.put(templateId, { ...template, open: true });
+    await Promise.all([
+        surveysRepository.insert({ templateId, responses: [] }),
+        templatesRepository.put(templateId, { ...template, open: true })
+    ]);
 }
 
-function closeSurvey(surveyId) {
+async function closeSurvey(surveyId) {
     // TODO: authorization
-    const survey = surveysRepository.getById(surveyId);
+    const survey = await surveysRepository.getById(surveyId);
 
     if (survey.closed) throw new Error(`Survey ${surveyId} is already closed.`);
 
-    surveysRepository.put(surveyId, { ...survey, closed: true });
+    const template = await templatesRepository.getById(survey.templateId);
 
-    const template = templatesRepository.getById(survey.templateId);
-
-    templatesRepository.put(survey.templateId, { ...template, open: false });
+    await Promise.all([
+        surveysRepository.put(surveyId, { ...survey, closed: true }),
+        templatesRepository.put(survey.templateId, { ...template, open: false })
+    ]);
 }
 
-function submitResponse(surveyId, response) {
-    const survey = surveysRepository.getById(surveyId);
+async function submitResponse(surveyId, response) {
+    const survey = await surveysRepository.getById(surveyId);
 
     if (survey.closed) throw new Error(`Survey ${surveyId} is aleady closed.`);
 
     // TODO: response validation
 
-    surveysRepository.put(surveyId, { ...survey, resposnes: survey.responses.concat([response]) });
+    await surveysRepository.put(surveyId, { ...survey, resposnes: survey.responses.concat([response]) });
 }
 
-function getResults(surveyId) {
-    const survey = surveysRepository.getById(surveyId);
+async function getResults(surveyId) {
+    const survey = await surveysRepository.getById(surveyId);
 
     if (!survey.closed) throw new Error(`Survey ${surveyId} is still ongoing.`);
 
