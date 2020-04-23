@@ -4,6 +4,7 @@
         width: 100,
         height: 50,
         text: 'drag me',
+        closeTrigger: 'dragend',
         position: 'right'
     };
 
@@ -62,6 +63,10 @@
         balloon.innerText = data.text;
 
         target.parentElement.appendChild(balloon);
+
+        target.addEventListener(data.closeTrigger, function () {
+            balloon.remove();
+        });
     }
 
     window.walkme = {
