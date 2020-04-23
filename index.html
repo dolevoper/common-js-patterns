@@ -99,6 +99,8 @@
         }
 
         function onDrop(e) {
+            if (!e.target.classList.contains('drop-zone')) return;
+            
             const id = e.dataTransfer.getData('text');
             const el = document.getElementById(id);
 

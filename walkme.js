@@ -3,7 +3,8 @@
         targetId: 'item1',
         width: 100,
         height: 50,
-        text: 'drag me'
+        text: 'drag me',
+        closeTrigger: 'dragend'
     };
 
     function drawBellow(data, targetRect, balloon) {
@@ -45,6 +46,10 @@
         balloon.innerText = data.text;
 
         target.parentElement.appendChild(balloon);
+
+        target.addEventListener(data.closeTrigger, function () {
+            balloon.remove();
+        });
     }
 
     window.walkme = {
