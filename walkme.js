@@ -3,7 +3,8 @@
         targetId: 'item1',
         width: 100,
         height: 50,
-        text: 'drag me'
+        text: 'drag me',
+        position: 'right'
     };
 
     function drawBellow(data, targetRect, balloon) {
@@ -30,11 +31,27 @@
         balloon.style.borderLeft = '3px solid red';
     }
 
-    function drawBalloon(data, drawStrategy = drawBellow) {
+    const drawStrategiesFactory = (function () {
+        const drawStrategies = new Map([
+            ['bellow', drawBellow],
+            ['above', drawAbove],
+            ['left', drawLeft],
+            ['right', drawRight]
+        ]);
+
+        return {
+            create(position) {
+                return drawStrategies.get(position) || drawBellow;
+            }
+        };
+    })();
+
+    function drawBalloon(data) {
         const target = document.getElementById(data.targetId);
         const balloon = document.createElement('div');
 
         const targetRect = target.getClientRects()[0];
+        const drawStrategy = drawStrategiesFactory.create(data.position);
 
         drawStrategy(data, targetRect, balloon);
 
@@ -48,9 +65,8 @@
     }
 
     window.walkme = {
-        play(drawStrategy) {
-            drawBalloon(balloonData, drawStrategy);
-        },
-        drawStrategies: { drawBellow, drawAbove, drawLeft, drawRight }
+        play() {
+            drawBalloon(balloonData);
+        }
     };
 })();
