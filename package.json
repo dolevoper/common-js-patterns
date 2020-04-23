@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "static-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "clone-deep": "^4.0.1",
-    "uuid": "^7.0.3"
+  "dependencies": {},
+  "devDependencies": {
+    "static-server": "^2.2.1"
   }
 }
