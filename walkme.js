@@ -1,6 +1,6 @@
 (function () {
     const balloonData = {
-        targetId: 'item1',
+        targetSelector: '#item1',
         width: 100,
         height: 50,
         text: 'drag me',
@@ -48,7 +48,7 @@
     })();
 
     function drawBalloon(data) {
-        const target = document.getElementById(data.targetId);
+        const target = document.querySelector(data.targetSelector);
         const balloon = document.createElement('div');
 
         const targetRect = target.getClientRects()[0];
